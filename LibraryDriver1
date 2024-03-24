@@ -1,0 +1,77 @@
+package version1;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LibraryDriver {
+    public static void serializeObject(String fileName, Object obj) {
+        try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(fileName))) {
+            os.writeObject(obj);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Object deSerializeObject(String fileName) {
+        Object obj = null;
+        try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(fileName))) {
+            obj = is.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+
+    public static void main(String[] args) {
+        // Creating authors
+        version1.Author author1 = new version1.Author("John", "Doe");
+        version1.Author author2 = new version1.Author("Jane", "Smith");
+
+        // Creating books
+        List<version1.Author> book1Authors = new ArrayList<>();
+        book1Authors.add(author1);
+        version1.Book book1 = new version1.Book("version1.Book 1", book1Authors);
+
+        List<version1.Author> book2Authors = new ArrayList<>();
+        book2Authors.add(author2);
+        version1.Book book2 = new version1.Book("version1.Book 2", book2Authors);
+
+        // Creating readers
+        version1.BookReader reader1 = new version1.BookReader("Alice", "Johnson", 1001);
+        version1.BookReader reader2 = new version1.BookReader("Bob", "Williams", 1002);
+
+        // Creating library
+        version1.Library library = new version1.Library("Central version1.Library");
+
+        // Adding books to the library
+        library.addBook(book1);
+        library.addBook(book2);
+
+        // Adding readers to the library
+        library.addReader(reader1);
+        library.addReader(reader2);
+
+        // Borrowing books
+        reader1.borrowBook(book1);
+        reader2.borrowBook(book2);
+
+        // Serializing library
+        serializeObject("library.ser", library);
+
+        // Deserializing library
+        version1.Library deserializedLibrary = (version1.Library) deSerializeObject("library.ser");
+
+        // Showing the state of deserialized library
+        System.out.println("Deserialized version1.Library Name: " + deserializedLibrary.getName());
+        System.out.println("Books in Deserialized version1.Library:");
+        for (version1.Book book : deserializedLibrary.getBooks()) {
+            System.out.println(book.getTitle());
+        }
+        System.out.println("Readers in Deserialized version1.Library:");
+        for (version1.BookReader reader : deserializedLibrary.getReaders()) {
+            System.out.println(reader.getFirstName() + " " + reader.getLastName());
+        }
+    }
+}
